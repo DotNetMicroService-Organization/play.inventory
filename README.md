@@ -1,2 +1,2 @@
-# Play.Catalog 
+# Play.Inventory 
 Play Economy Inventory microservice.
