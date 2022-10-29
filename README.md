@@ -3,7 +3,7 @@ Play Economy Inventory microservice.
 
 ## Create and publish package Contracts
 ```powershell
-$version="1.0.4"
+$version="1.0.5"
 $owner="DotNetMicroService-Organization"
 $ph_pat="[PAT HERE]"
 
@@ -31,4 +31,34 @@ docker run -it --rm -p 5004:5004 --name inventory -e MongoDbSettings__Connection
 ```powershell
 az acr login --name $appname
 docker push "$appname.azurecr.io/play.inventory:$version"
+```
+
+## Create the k8s namespace
+```powershell
+$namespace="inventory"
+kubectl create namespace $namespace
+```
+
+<!-- ## Create the k8s secret
+```powershell
+kubectl create secret generic identity-secrets --from-literal=cosmosdb-connectionstring=$cosmosDbConnString --from-literal=servicebus-connectionstring=$serviceBusConnString --from-literal=admin-password=$adminPass -n $namespace
+``` -->
+
+## Create the k8s pod
+```powershell
+kubectl apply -f kubernetes\identity.yaml -n $namespace
+```
+
+## Create the pod managed identity
+```powershell
+az identity create --resource-group $appname -n $namespace
+$IDENTITY_RESOURCE_ID=az identity show -g $appname -n $namespace --query id -otsv
+
+az aks pod-identity add --resource-group $appname --cluster-name $appname --namespace $namespace --name $namespace --identity-resource-id $IDENTITY_RESOURCE_ID
+```
+
+## Granting access to key vault secrets
+```powershell
+$IDENTITY_CLIENT_ID=az identity show -g $appname -n $namespace --query clientId -otsv
+az keyvault set-policy -n $appname --secret-permissions get list --spn $IDENTITY_CLIENT_ID
 ```
