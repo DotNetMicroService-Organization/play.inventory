@@ -21,7 +21,7 @@ spec:
             - name: ServiceSettings__KeyVaultName
               value: dotnetplayeconomy
             - name: ServiceSettings__Authority
-              value: https://dotnetplayeconomy.eastus.cloudapp.azure.com/inventory-svc
+              value: https://dotnetplayeconomy.eastus.cloudapp.azure.com/identity-svc
           resources:
             limits:
               memory: "128Mi"
