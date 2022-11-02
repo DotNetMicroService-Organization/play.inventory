@@ -39,16 +39,6 @@ $namespace="inventory"
 kubectl create namespace $namespace
 ```
 
-<!-- ## Create the k8s secret
-```powershell
-kubectl create secret generic identity-secrets --from-literal=cosmosdb-connectionstring=$cosmosDbConnString --from-literal=servicebus-connectionstring=$serviceBusConnString --from-literal=admin-password=$adminPass -n $namespace
-``` -->
-
-## Create the k8s pod
-```powershell
-kubectl apply -f kubernetes\inventory.yaml -n $namespace
-```
-
 ## Create the pod managed identity
 ```powershell
 az identity create --resource-group $appname -n $namespace
@@ -61,4 +51,16 @@ az aks pod-identity add --resource-group $appname --cluster-name $appname --name
 ```powershell
 $IDENTITY_CLIENT_ID=az identity show -g $appname -n $namespace --query clientId -otsv
 az keyvault set-policy -n $appname --secret-permissions get list --spn $IDENTITY_CLIENT_ID
+```
+
+## install the helm chart
+```powershell
+$helmUser=[guid]::Empty.Guid
+$helmPassword=az acr login --name $appname --expose-token --output tsv --query accessToken
+
+$env:HELM_EXPERIMENTAL_OCI=1
+helm registry login "$appname.azurecr.io" --username $helmUser --password $helmPassword
+
+$chartVersion="0.1.0"
+helm upgrade inventory-service oci://$appname.azurecr.io/helm/microservice --version $chartVersion -f .\helm\values.yaml -n $namespace --install
 ```
