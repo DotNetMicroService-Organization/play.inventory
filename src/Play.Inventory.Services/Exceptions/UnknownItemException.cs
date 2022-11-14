@@ -1,14 +1,11 @@
-using System;
+namespace Play.Inventory.Services.Exceptions;
 
-namespace Play.Inventory.Services.Exceptions
+[Serializable]
+internal class UnknownItemException : Exception
 {
-    [Serializable]
-    internal class UnknownItemException : Exception
+    public Guid ItemId { get; }
+    public UnknownItemException(Guid itemId) : base($"Unknown item'{itemId}'")
     {
-        public Guid ItemId { get; }
-        public UnknownItemException(Guid itemId) : base($"Unknown item'{itemId}'")
-        {
-            this.ItemId = itemId;
-        }
+        this.ItemId = itemId;
     }
 }

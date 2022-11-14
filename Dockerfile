@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-focal AS base
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS base
 WORKDIR /app
 EXPOSE 5004
 
@@ -9,7 +9,7 @@ ENV ASPNETCORE_URLS=http://+:5004
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 COPY ["src/Play.Inventory.Contracts/Play.Inventory.Contracts.csproj", "src/Play.Inventory.Contracts/"]
 COPY ["src/Play.Inventory.Services/Play.Inventory.Service.csproj", "src/Play.Inventory.Services/"]
 

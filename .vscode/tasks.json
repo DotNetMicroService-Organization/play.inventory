@@ -7,10 +7,14 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Play.Inventory.Service.csproj",
+                "${workspaceFolder}/src/Play.Inventory.Services/Play.Inventory.Service.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": "$msCompile"
         },
         {

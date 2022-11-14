@@ -1,38 +1,36 @@
-using System.Threading.Tasks;
 using MassTransit;
 using Play.Catalog.Contracts;
 using Play.Common;
 using Play.Inventory.Services.Entities;
 
-namespace Play.Inventory.Services.Consumers
+namespace Play.Inventory.Services.Consumers;
+
+public class CatalogItemCreatedConsumer : IConsumer<CatalogItemCreated>
 {
-    public class CatalogItemCreatedConsumer : IConsumer<CatalogItemCreated>
+    private readonly IRepository<CatalogItem> repository;
+
+    public CatalogItemCreatedConsumer(IRepository<CatalogItem> repository)
     {
-        private readonly IRepository<CatalogItem> repository;
+        this.repository = repository;
+    }
 
-        public CatalogItemCreatedConsumer(IRepository<CatalogItem> repository)
+    public async Task Consume(ConsumeContext<CatalogItemCreated> context)
+    {
+        var message = context.Message;
+
+        var item = await repository.GetAsync(message.ItemId);
+
+        if (item is not null)
+            return;
+
+        item = new CatalogItem
         {
-            this.repository = repository;
-        }
+            Id = message.ItemId,
+            Name = message.Name,
+            Description = message.Description
+        };
 
-        public async Task Consume(ConsumeContext<CatalogItemCreated> context)
-        {
-            var message = context.Message;
+        await repository.CreateAsync(item);
 
-            var item = await repository.GetAsync(message.ItemId);
-
-            if (item is not null)
-                return;
-
-            item = new CatalogItem
-            {
-                Id = message.ItemId,
-                Name = message.Name,
-                Description = message.Description
-            };
-
-            await repository.CreateAsync(item);
-
-        }
     }
 }
